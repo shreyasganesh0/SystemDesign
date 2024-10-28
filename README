@@ -1,0 +1,8 @@
+### SYSTEM DESGIN CONCEPTS IMPLEMENTATION
+
+## Working with Load Balancers
+1. Nginx
+    Buidling a simple Web appication in Flask that crears 3 flask server managed by the nginx reverse proxy.
+    ![alt text](image.png)
+
+    

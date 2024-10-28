@@ -1,13 +1,17 @@
-from flask import Flask
-import sys
+from fastapi import FastAPI, Depends
+import os
+from functools import lru_cache
+from typing_extensions import Annotated
+from uvicorn import Config, Server
+from . import conf
 
-app = Flask('demo')
+app = FastAPI()
 
-@app.route('/')
-def hello_world():
-    return f'Hello, {app.config["PORT"]}!\n'
+@lru_cache
+def get_settings():
+    return conf.Settings()
 
-if __name__ == '__main__':
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
-    app.config['PORT'] = port  # Set the port in app config
-    app.run(host='127.0.0.1', port=port)
+@app.get("/")
+async def root(settings: Annotated[conf.Settings, Depends(get_settings)]):
+    port = os.environ.get("PORT", settings.port_number)
+    return f'Hello {port}'
