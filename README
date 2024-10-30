@@ -1,8 +1,56 @@
 ### SYSTEM DESGIN CONCEPTS IMPLEMENTATION
 
 ## Working with Load Balancers
-1. Nginx
+
     Buidling a simple Web appication in Flask that crears 3 flask server managed by the nginx reverse proxy.
     ![alt text](image.png)
 
+
+1. Nginx
+
+    Running nginx on a raspberry pi that was setup headless on a ubuntu v 24.10 server OS x64
+
+    The server is running on a docker container 
+    pull the docker image:
     
+    docker pull nginx
+
+    run nginx on docker using:
+
+    docker run --name mynginx1 -p 8080:80 -d nginx 
+
+    This specifies that our container is running on port 80 and we have to map nginx's port 8080 to docker's port
+
+    We can additionally create a dockerfile to specify the details to docker on what commands it needs to run instead of typing it out everytime we want to create a new docker image.
+    
+    Since we just want to upload a new config file for the nginx revrese proxy for now we are just going to create a dockerfile that adds the conf file from the hosts directory when a new image for nginx is generated but to note there are two other ways to dynamically update docker called 
+         -bind-mount: which mounts a directory on the host directly to a directory inside the container so any changes will be made to docker.
+
+         docker run --name mynginx2 \
+        --mount type=bind,source=/var/www,target=/usr/share/nginx/html,readonly \
+        --mount type=bind,source=/var/nginx/conf,target=/etc/nginx/conf,readonly \
+        -p 80:80 \
+        -d nginxplus
+
+         -volumes that mention a voulme of the docker container in the dockerfile. Then create another container based on the image of the original container. Create a third, debian container that has ssh access to upload files to the second container. We can now use the bash shell to send commands to the container.
+        
+        docker run --name mynginx4 -p 80:80 -d mynginx_image2
+
+        $ docker run -i -t --volumes-from mynginx4 --name mynginx4_files debian /bin/bash
+        root@b1cbbad63dd1:/#
+
+        docker start mynginx4_files
+
+
+2. FastAPI based application running on uvicorn ASGI server that  simply returns the port number that it is currently running on when the root directory is accesed. Currently configured to run on local host
+    
+    Using pydantic to set some base configuration default values from .env file that maybe useful when trying to create dev, QA and prod enviornments.
+
+    run the server on different hosts with the following command:
+
+    uvicorn main:app --port 8003
+    uvicorn main:app --port 8002
+    uvicorn main:app --port 8001
+
+    run these on three separate terminals that will host the server by default on localhost on port 8000 if no value is mentioned.
+
