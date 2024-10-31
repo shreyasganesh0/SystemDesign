@@ -41,6 +41,15 @@
 
         docker start mynginx4_files
 
+        For the purposes of simplicity I have added the simple commands to the docker file to delete the existing deafult.conf from nginx inside the contianer and copy the conf file in the conf directory to hte nginx server.
+
+        Build the Dockerfile using
+
+        sudo docker build -t nginx_reverse_proxy .
+
+        Run the built nginx sevrer using
+
+        docker run --name mynginx -p 8080:80 -d nginx_reverse_proxy
 
 2. FastAPI based application running on uvicorn ASGI server that  simply returns the port number that it is currently running on when the root directory is accesed. Currently configured to run on local host
     
